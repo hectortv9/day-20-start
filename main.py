@@ -30,23 +30,24 @@ def play():
     screen_width = 620
     screen_height = 620
     bounded_screen = Screen(screen_width, screen_height)
-    s = bounded_screen.screen
-    s.bgcolor("black")
-    s.title("Snake Game")
+    screen = bounded_screen.screen
+    screen.bgcolor("black")
+    screen.title("Snake Game")
     scoreboard = Scoreboard(bounded_screen.up_bound)
     grid = FoodGrid(bounded_screen, scoreboard, snake.SNAKE_PART_SIZE)
     grid.draw_grid_edges(grid.screen, grid.boundaries)
+    start_listening(screen)
 
     # grid.draw_grid(grid.screen, grid.boundaries, grid.gap_size)
     # bounded_screen.get_visual_help()
     # grid.get_visual_help()
 
-    start_listening(s)
+    screen.textinput("Get ready", "Close this window whenever you are ready to start playing.")
     while True:
 
         interactions = snake.move(grid)
         if interactions["did_collide"]:
-            stop_listening(s)
+            stop_listening(screen)
             scoreboard.print_game_over()
             break
         elif interactions["did_eat"]:
@@ -54,7 +55,7 @@ def play():
             if scoreboard.score % score_threshold == 0:  # increase speed
                 delay = delay - delay_decrement
         time.sleep(delay)
-    s.exitonclick()
+    screen.exitonclick()
 
 
 play()

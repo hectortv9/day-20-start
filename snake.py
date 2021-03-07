@@ -26,9 +26,8 @@ class Snake:
         self.turning = False
         self.body = [SnakePart(0, 0)]
         self.head = self.body[0]
+        self.screen = self.head.getscreen()
         self.grow_snake(size - 1)  # head counts as part of Snake's size
-
-        self.snake = self.body  # TODO: DELETE
 
     @staticmethod
     def get_xy_increment(x, y, heading, distance):
@@ -51,52 +50,54 @@ class Snake:
         }[heading]
 
     def grow_snake(self, number_of_parts):
+        self.screen.tracer(0)
         for _ in range(number_of_parts):
             tail = self.body[-1]
             new_position = Snake.get_xy_decrement(tail.xcor(), tail.ycor(), tail.heading(), self.SNAKE_PART_SIZE)
             self.add_part(*new_position)
+        self.screen.tracer(1)
 
     def add_part(self, x, y):
         self.body.append(SnakePart(x, y))
 
     def move(self, grid):
-        last_index = len(self.body) - 1
-        tail_position = self.body[last_index].position()
-        # for loop will move the snake except for its head
-        for index in range(last_index, 0, -1):  # exclude head, it will move based on user's input
-            next_position = self.body[index - 1].position()
-            self.body[index].setposition(next_position[X], next_position[Y])
+        self.screen.tracer(0)
+        original_heading = self.head.heading()
+        original_position = self.head.position()
+        self.head.forward(self.SNAKE_PART_SIZE)
+        position = self.head.position()
+        # check collision with boundaries
+        did_eat = False
+        if (position[X] < grid.left_bound or position[X] > grid.right_bound
+                or position[Y] < grid.down_bound or position[Y] > grid.up_bound):
+            did_collide = True
         else:
-            self.turning = True
-            heading = self.head.heading()
-            position = self.head.position()
-            if heading == UP and (abs(position[Y]) + self.SNAKE_PART_SIZE) > abs(grid.up_bound):
-                did_collided = True
-            elif heading == DOWN and (abs(position[Y]) + self.SNAKE_PART_SIZE) > abs(grid.down_bound):
-                did_collided = True
-            elif heading == LEFT and (abs(position[X]) + self.SNAKE_PART_SIZE) > abs(grid.left_bound):
-                did_collided = True
-            elif heading == RIGHT and (abs(position[X]) + self.SNAKE_PART_SIZE) > abs(grid.right_bound):
-                did_collided = True
+            # check collision with snake's body
+            for index in range(1, len(self.body)):  # start from one to exclude snake's head
+                distance = self.head.distance(self.body[index])
+                if distance < (self.SNAKE_PART_SIZE / 2):
+                    did_collide = True
+                    break
             else:
-                did_collided = False
-                for index in range(2, len(self.body)):
-                    distance = self.head.distance(self.body[index])
-                    if distance < (self.SNAKE_PART_SIZE / 2):
-                        print(f"index={index}, distance={distance}, "
-                              f"head={self.head.position()}, body[index]={self.body[index].position()}")
-                        did_collided = True
-                        break
-        if did_collided:
-            print(f"heading={heading}, position={position}")
-            self.head.color("red")
-            self.head.shape("arrow")
+                did_collide = False
+                did_eat = grid.has_snake_eaten_food(self.head)
+        if did_collide:
+            self.turning = True
+            self.head.setposition(original_position)
+            self.head.setheading(original_heading)
+            collision_indicator = SnakePart(*original_position)
+            collision_indicator.setheading(original_heading)
+            collision_indicator.color("red")
+            collision_indicator.shape("arrow")
         else:
-            self.head.forward(self.SNAKE_PART_SIZE)
-            if grid.has_snake_eaten_food(self.head):
-                self.add_part(*tail_position)
-        self.turning = False
-        return did_collided
+            for index in range(1, len(self.body)):  # start from one to exclude snake's head
+                position = self.body[index].position()
+                self.body[index].setposition(original_position)
+                original_position = position
+            if did_eat:
+                self.add_part(*original_position)
+        self.screen.tracer(1)
+        return {"did_collide": did_collide, "did_eat": did_eat}
 
     def left(self):
         if self.turning:

@@ -47,7 +47,6 @@ class Screen:
         self.utility_turtle.pencolor(color)
         self.utility_turtle.penup()
 
-
     @staticmethod
     def initialize_screen(screen, window_width, window_height):
         screen.screensize(canvwidth=window_width - 2, canvheight=window_height - 2)

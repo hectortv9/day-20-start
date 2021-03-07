@@ -1,7 +1,5 @@
 from turtle import Turtle
 import random
-from bounded_screen import Screen
-import time
 
 COLORS = ("red", "blue", "green", "magenta", "yellow", "orange", "purple", "cyan")
 

@@ -4,7 +4,8 @@ from bounded_screen import Screen
 from scoreboard import Scoreboard
 import time
 
-snake = None
+snake = Snake(3)
+
 
 def start_listening(screen):
     screen.onkeypress(snake.left, "Left")
@@ -13,23 +14,25 @@ def start_listening(screen):
     screen.onkeypress(snake.down, "Down")
     screen.listen()
 
+
 def stop_listening(screen):
     screen.onkeypress(None, "Left")
     screen.onkeypress(None, "Right")
     screen.onkeypress(None, "Up")
     screen.onkeypress(None, "Down")
 
+
 def play():
     global snake
+    delay = 0.08
+    score_threshold = 2
+    delay_decrement = 0.008
     screen_width = 620
     screen_height = 620
     bounded_screen = Screen(screen_width, screen_height)
     s = bounded_screen.screen
     s.bgcolor("black")
     s.title("Snake Game")
-    #s.tracer(0)
-    snake = Snake(3)
-    s.tracer(1)
     scoreboard = Scoreboard(bounded_screen.up_bound)
     grid = FoodGrid(bounded_screen, scoreboard, snake.SNAKE_PART_SIZE)
     grid.draw_grid_edges(grid.screen, grid.boundaries)
@@ -41,32 +44,16 @@ def play():
     start_listening(s)
     while True:
 
-        did_collided = snake.move(grid)
-        if did_collided:
+        interactions = snake.move(grid)
+        if interactions["did_collide"]:
             stop_listening(s)
             scoreboard.print_game_over()
             break
-        """
-        #did_collided = snake.move2(grid.up_bound, grid.down_bound, grid.left_bound, grid.right_bound)
-        heading = snake.get_heading()
-        will_eat = snake.will_eat(grid.eaten_distance, grid.food)
-        if will_eat and heading == snake.get_heading():
-            snake.snake.append(snake.eat(snake.get_snake_head()))
-            will_collide = False
-        else:
-            will_collide = snake.will_collide(grid.up_bound, grid.down_bound, grid.left_bound, grid.right_bound)
-            snake.move(will_collide)
-
-        if will_collide:
-            stop_listening(s)
-            scoreboard.print_game_over()
-            break
-        was_eaten = grid.has_snake_eaten_food(snake.get_snake_head())
-        if was_eaten:
-            grid.get_more_food()
+        elif interactions["did_eat"]:
             scoreboard.increase_score()
-        #snake.block_turning(False)"""
-        time.sleep(0.1)
+            if scoreboard.score % score_threshold == 0:  # increase speed
+                delay = delay - delay_decrement
+        time.sleep(delay)
     s.exitonclick()
 
 

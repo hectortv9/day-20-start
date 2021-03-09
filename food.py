@@ -2,6 +2,7 @@ from turtle import Turtle
 import random
 
 COLORS = ("red", "blue", "green", "magenta", "yellow", "orange", "purple", "cyan")
+UP, DOWN, LEFT, RIGHT = "up", "down", "left", "right"
 
 
 class Food(Turtle):
@@ -26,10 +27,10 @@ class FoodGrid:
         self.scoreboard = scoreboard
 
         self.boundaries = self.get_grid_bounds()
-        self.up_bound = self.boundaries["up"]
-        self.left_bound = self.boundaries["left"]
-        self.right_bound = self.boundaries["right"]
-        self.down_bound = self.boundaries["down"]
+        self.up_bound = self.boundaries[UP]
+        self.left_bound = self.boundaries[LEFT]
+        self.right_bound = self.boundaries[RIGHT]
+        self.down_bound = self.boundaries[DOWN]
 
         self.lowest_gap = (int(self.left_bound + gap_size / 2), int(self.down_bound + gap_size / 2))
         self.horizontal_gap_count = int((abs(self.left_bound) + abs(self.right_bound)) / gap_size)
@@ -65,12 +66,12 @@ class FoodGrid:
         bounded_screen.utility_turtle.speed(0)
         bounded_screen.utility_turtle.pencolor("white")
         turtle = bounded_screen.utility_turtle
-        turtle.goto(boundaries["left"], boundaries["up"])
+        turtle.goto(boundaries[LEFT], boundaries[UP])
         turtle.pendown()
-        turtle.goto(boundaries["right"], boundaries["up"])
-        turtle.goto(boundaries["right"], boundaries["down"])
-        turtle.goto(boundaries["left"], boundaries["down"])
-        turtle.goto(boundaries["left"], boundaries["up"])
+        turtle.goto(boundaries[RIGHT], boundaries[UP])
+        turtle.goto(boundaries[RIGHT], boundaries[DOWN])
+        turtle.goto(boundaries[LEFT], boundaries[DOWN])
+        turtle.goto(boundaries[LEFT], boundaries[UP])
         turtle.penup()
         bounded_screen.utility_turtle.pencolor(color)
         bounded_screen.utility_turtle.speed(speed)
@@ -82,15 +83,15 @@ class FoodGrid:
         bounded_screen.utility_turtle.speed(0)
         bounded_screen.utility_turtle.pencolor("yellow")
         turtle = bounded_screen.utility_turtle
-        for y in range(boundaries["down"], boundaries["up"] + 1, gap_size):
-            turtle.goto(boundaries["left"], y)
+        for y in range(boundaries[DOWN], boundaries[UP] + 1, gap_size):
+            turtle.goto(boundaries[LEFT], y)
             turtle.pendown()
-            turtle.goto(boundaries["right"], y)
+            turtle.goto(boundaries[RIGHT], y)
             turtle.penup()
-        for x in range(boundaries["left"], boundaries["right"] + 1, gap_size):
-            turtle.goto(x, boundaries["up"])
+        for x in range(boundaries[LEFT], boundaries[RIGHT] + 1, gap_size):
+            turtle.goto(x, boundaries[UP])
             turtle.pendown()
-            turtle.goto(x, boundaries["down"])
+            turtle.goto(x, boundaries[DOWN])
             turtle.penup()
         bounded_screen.utility_turtle.pencolor(color)
         bounded_screen.utility_turtle.speed(speed)
@@ -144,4 +145,4 @@ class FoodGrid:
         if not(up > down and right > left):
             raise Exception(f"ERROR: INSUFFICIENT SPACE FOR FOOD GRID. raw_width={raw_width}, raw_height={raw_height}")
 
-        return {"up": up, "down": down, "left": left, "right": right, }
+        return {UP: up, DOWN: down, LEFT: left, RIGHT: right, }

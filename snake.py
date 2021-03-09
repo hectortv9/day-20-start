@@ -43,10 +43,10 @@ class Snake:
     def get_xy_some_crement(x, y, heading, distance, signed_multiplicative_identity):
         """Returns a tuple with the new (x,y) coordinate."""
         return {
-            0: (x + distance * signed_multiplicative_identity, y),
-            90: (x, y + distance * signed_multiplicative_identity),
-            180: (x - distance * signed_multiplicative_identity, y),
-            270: (x, y - distance * signed_multiplicative_identity),
+            RIGHT: (x + distance * signed_multiplicative_identity, y),
+            UP: (x, y + distance * signed_multiplicative_identity),
+            LEFT: (x - distance * signed_multiplicative_identity, y),
+            DOWN: (x, y - distance * signed_multiplicative_identity),
         }[heading]
 
     def grow_snake(self, number_of_parts):
@@ -73,9 +73,8 @@ class Snake:
             did_collide = True
         else:
             # check collision with snake's body
-            for index in range(1, len(self.body)):  # start from one to exclude snake's head
-                distance = self.head.distance(self.body[index])
-                if distance < (self.SNAKE_PART_SIZE / 2):
+            for part in self.body[3:]:  # start from one to exclude snake's head
+                if self.head.distance(part) < (self.SNAKE_PART_SIZE / 2):
                     did_collide = True
                     break
             else:
@@ -90,9 +89,9 @@ class Snake:
             collision_indicator.color("red")
             collision_indicator.shape("arrow")
         else:
-            for index in range(1, len(self.body)):  # start from one to exclude snake's head
-                position = self.body[index].position()
-                self.body[index].setposition(original_position)
+            for part in self.body[1:]:  # start from one to exclude snake's head
+                position = part.position()
+                part.setposition(original_position)
                 original_position = position
             if did_eat:
                 self.add_part(*original_position)

@@ -1,4 +1,5 @@
-from turtle import Turtle
+from turtle import Turtle, Screen
+import utils
 
 RIGHT = 0
 UP = 90
@@ -6,28 +7,38 @@ LEFT = 180
 DOWN = 270
 
 X, Y = 0, 1
+SNAKE_COLOR = "white"
 
 
 class SnakePart(Turtle):
 
-    def __init__(self, x, y):
+    def __init__(self, x, y, color=SNAKE_COLOR):
         super().__init__(shape="square", visible=False)
         self.penup()
         self.speed(0)
-        self.color("white")
+        self.color(SNAKE_COLOR)
         self.setposition(x, y)
         self.showturtle()
 
 
 class Snake:
 
-    def __init__(self, size):
+    def __init__(self, size, color, transform_to_complementary):
+        self.set_snake_default_color(color, transform_to_complementary, Screen().colormode())
         self.SNAKE_PART_SIZE = 20
         self.turning = False
         self.body = [SnakePart(0, 0)]
         self.head = self.body[0]
         self.screen = self.head.getscreen()
         self.grow_snake(size - 1)  # head counts as part of Snake's size
+
+    @staticmethod
+    def set_snake_default_color(color, transform_to_complementary, colormode):
+        global SNAKE_COLOR
+        if transform_to_complementary:
+            SNAKE_COLOR = utils.get_complementary_color(color, colormode)
+        else:
+            SNAKE_COLOR = color
 
     @staticmethod
     def get_xy_increment(x, y, heading, distance):
@@ -129,3 +140,4 @@ class Snake:
         if self.head.heading() in (LEFT, RIGHT):
             self.head.setheading(DOWN)
         self.turning = False
+

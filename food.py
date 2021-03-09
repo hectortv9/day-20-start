@@ -1,14 +1,21 @@
 from turtle import Turtle
 import random
 
+X, Y = 0, 1
 COLORS = ("red", "blue", "green", "magenta", "yellow", "orange", "purple", "cyan")
 UP, DOWN, LEFT, RIGHT = "up", "down", "left", "right"
+GRID_EDGE_COLOR = "white"
+FOOD_SHAPE = "circle"
+# Visual help variables
+GRID_COLOR = "yellow"
+FILL_GAP_COLOR = "orange"
+FILL_GAP_SHAPE = "circle"
 
 
 class Food(Turtle):
 
     def __init__(self, x, y):
-        super().__init__(shape="circle", visible=True)
+        super().__init__(shape=FOOD_SHAPE, visible=True)
         self.penup()
         self.speed(0)
         self.set_position(x, y)
@@ -40,8 +47,8 @@ class FoodGrid:
         self.eaten_distance = gap_size * 0.7  # distance at which food can be considered eaten by snake
 
     def get_random_coordinate(self):
-        x = int(random.random() * self.horizontal_gap_count) * self.gap_size + self.lowest_gap[0]
-        y = int(random.random() * self.vertical_gap_count) * self.gap_size + self.lowest_gap[1]
+        x = int(random.random() * self.horizontal_gap_count) * self.gap_size + self.lowest_gap[X]
+        y = int(random.random() * self.vertical_gap_count) * self.gap_size + self.lowest_gap[Y]
         return x, y
 
     def has_snake_eaten_food(self, snake_head):
@@ -64,7 +71,7 @@ class FoodGrid:
         color = bounded_screen.utility_turtle.pencolor()
         speed = bounded_screen.utility_turtle.speed()
         bounded_screen.utility_turtle.speed(0)
-        bounded_screen.utility_turtle.pencolor("white")
+        bounded_screen.utility_turtle.pencolor(GRID_EDGE_COLOR)
         turtle = bounded_screen.utility_turtle
         turtle.goto(boundaries[LEFT], boundaries[UP])
         turtle.pendown()
@@ -81,7 +88,7 @@ class FoodGrid:
         color = bounded_screen.utility_turtle.pencolor()
         speed = bounded_screen.utility_turtle.speed()
         bounded_screen.utility_turtle.speed(0)
-        bounded_screen.utility_turtle.pencolor("yellow")
+        bounded_screen.utility_turtle.pencolor(GRID_COLOR)
         turtle = bounded_screen.utility_turtle
         for y in range(boundaries[DOWN], boundaries[UP] + 1, gap_size):
             turtle.goto(boundaries[LEFT], y)
@@ -98,15 +105,15 @@ class FoodGrid:
 
     def fill_lowest_gaps(self):
         for x in range(self.horizontal_gap_count):
-            turtle = Turtle(shape="circle")
+            turtle = Turtle(shape=FILL_GAP_SHAPE)
             turtle.speed(0)
-            turtle.color("orange")
-            turtle.setposition(self.lowest_gap[0] + (x * self.gap_size), self.lowest_gap[1])
+            turtle.color(FILL_GAP_COLOR)
+            turtle.setposition(self.lowest_gap[X] + (x * self.gap_size), self.lowest_gap[Y])
         for y in range(self.vertical_gap_count):
-            turtle = Turtle(shape="circle")
+            turtle = Turtle(shape=FILL_GAP_SHAPE)
             turtle.speed(0)
-            turtle.color("orange")
-            turtle.setposition(self.lowest_gap[0], self.lowest_gap[1] + (y * self.gap_size))
+            turtle.color(FILL_GAP_COLOR)
+            turtle.setposition(self.lowest_gap[X], self.lowest_gap[Y] + (y * self.gap_size))
 
     @staticmethod
     def adjust_boundary(boundary, gap_size):

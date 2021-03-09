@@ -10,6 +10,7 @@ DELAY_DECREMENT = 0.008
 SCREEN_WIDTH = 620
 SCREEN_HEIGHT = 620
 SCREEN_BGCOLOR = "black"
+SNAKE_COLOR = "white"
 SCREEN_TITLE = "Snake Game"
 UP, DOWN, LEFT, RIGHT = "Up", "Down", "Left", "Right"  # Key names
 
@@ -19,10 +20,11 @@ class Game:
     def __init__(self):
         self.bounded_screen = Screen(SCREEN_WIDTH, SCREEN_HEIGHT)
         self.screen = self.bounded_screen.screen
-        self.snake = Snake(3)
+        self.snake = Snake(3, SCREEN_BGCOLOR, True)
         self.scoreboard = Scoreboard(self.bounded_screen.up_bound)
         self.grid = FoodGrid(self.bounded_screen, self.scoreboard, self.snake.SNAKE_PART_SIZE)
         self.initialize_game()
+        self.get_visual_help()
 
     def start_listening(self):
         self.screen.onkeypress(self.snake.left, LEFT)
@@ -44,8 +46,8 @@ class Game:
         self.start_listening()
 
     def get_visual_help(self):
-        self.grid.draw_grid(self.grid.screen, self.grid.boundaries, self.grid.gap_size)
         self.bounded_screen.get_visual_help()
+        # self.grid.draw_grid(self.grid.screen, self.grid.boundaries, self.grid.gap_size)
         self.grid.get_visual_help()
 
     def do_start_game(self):

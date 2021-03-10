@@ -10,25 +10,57 @@ SCREEN_MODE = "standard"
 SCREEN_COLORMODE = 255
 SCREEN_XY_AXES_COLOR = "blue"
 SCREEN_BOUNDARIES_COLOR = "red"
+SCREEN_WIDTH = 620
+SCREEN_HEIGHT = 620
+SCREEN_BGCOLOR = "black"
+SCREEN_TITLE = "Generic Game"
 
 
-class Screen:
+class _Box:
 
-    def __init__(self, window_width, window_height,
-                 screen=turtle.Screen(), mode=SCREEN_MODE, colormode=SCREEN_COLORMODE):
-        self.screen = Screen.initialize_screen(screen, window_width, window_height)
-        self.mode = mode
-        self.screen.colormode(colormode)
+    screen = None
+
+    def __init__(self):
+        if _Box.screen is None:
+            ScreenBox()
+
+
+class _ScreenBox:
+
+    def __init__(self, window_width=SCREEN_WIDTH, window_height=SCREEN_HEIGHT, title=SCREEN_TITLE,
+                 bgcolor=SCREEN_BGCOLOR, mode=SCREEN_MODE, colormode=SCREEN_COLORMODE):
+        self.screen = _ScreenBox.initialize_screen(
+            turtle.Screen(), window_width, window_height, title, bgcolor, mode, colormode)
         self.right_bound = int(math.floor(window_width / 2)) - LARGE_OFFSET
         self.left_bound = -(int(math.floor(window_width / 2)) - SMALL_OFFSET)
         self.up_bound = int(math.floor(window_height / 2)) - SMALL_OFFSET
         self.down_bound = -(int(math.floor(window_height / 2)) - LARGE_OFFSET)
-        self.utility_turtle = Screen.initialize_turtle()
+        self.complementary_color = self.get_complementary_color(bgcolor)
+        self.utility_turtle = _ScreenBox.initialize_turtle()
+
+    def get_complementary_color(self, color):
+        canvas = self.screen.getcanvas()
+        root = canvas.winfo_toplevel()
+        r, g, b = root.winfo_rgb(color)
+
+        colormode = self.screen.colormode()
+        if colormode == 255:
+            # the 8-bit shift is because rgb function returns 16 bit integer. Result = 65,535(0xFFFF) to 255(0xFF)
+            # Complementary color is the result of subtracting the actual color from the max color value
+            r, g, b = colormode - (r >> 8), colormode - (g >> 8), colormode - (b >> 8)
+        else:
+            pass  # don't know about the other color modes ... research and implement
+
+        return r, g, b
 
     @staticmethod
-    def initialize_screen(screen, window_width, window_height):
+    def initialize_screen(screen, window_width, window_height, title, bgcolor, mode, colormode):
         screen.screensize(canvwidth=window_width - 2, canvheight=window_height - 2)
         screen.setup(window_width, window_height)
+        screen.mode(mode)
+        screen.colormode(colormode)
+        screen.bgcolor(bgcolor)
+        screen.title(title)
         return screen
 
     @staticmethod
@@ -39,6 +71,16 @@ class Screen:
         utility_turtle.pencolor(UTILITY_TURTLE_COLOR)
         utility_turtle.penup()
         return utility_turtle
+
+    def clear_screen(self):
+        backup_color = self.screen.bgcolor()
+        backup_mode = self.screen.mode()
+        backup_colormode = self.screen.colormode()
+        self.screen.clear()
+        self.screen.bgcolor(backup_color)
+        self.screen.mode(backup_mode)
+        self.screen.colormode(backup_colormode)
+        self.utility_turtle = _ScreenBox.initialize_turtle()
 
     def draw_boundaries(self):
         color = self.utility_turtle.pencolor()
@@ -73,3 +115,14 @@ class Screen:
         for coordinate in args:
             self.utility_turtle.goto(coordinate[X], coordinate[Y])
         self.utility_turtle.penup()
+
+
+# ScreenBox singleton ---------------------------------------------------------------------------
+def ScreenBox(window_width=SCREEN_WIDTH, window_height=SCREEN_HEIGHT, title=SCREEN_TITLE,
+              bgcolor=SCREEN_BGCOLOR, mode=SCREEN_MODE, colormode=SCREEN_COLORMODE):
+    """Return the singleton _ScreenBox object.
+    If none exists at the moment, create a new one and return it,
+    else return the existing one."""
+    if _Box.screen is None:
+        _Box.screen = _ScreenBox(window_width, window_height, title, bgcolor, mode, colormode)
+    return _Box.screen

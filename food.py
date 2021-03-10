@@ -1,10 +1,11 @@
 from turtle import Turtle
 import random
+from screen_box import ScreenBox
 
 X, Y = 0, 1
 COLORS = ("red", "blue", "green", "magenta", "yellow", "orange", "purple", "cyan")
 UP, DOWN, LEFT, RIGHT = "up", "down", "left", "right"
-GRID_EDGE_COLOR = "white"
+GRID_EDGE_COLOR = "magenta"
 FOOD_SHAPE = "circle"
 # Visual help variables
 GRID_COLOR = "yellow"
@@ -28,8 +29,7 @@ class Food(Turtle):
 
 class FoodGrid:
 
-    def __init__(self, bounded_screen, scoreboard, gap_size):
-        self.screen = bounded_screen
+    def __init__(self, scoreboard, gap_size):
         self.gap_size = gap_size
         self.scoreboard = scoreboard
 
@@ -62,46 +62,45 @@ class FoodGrid:
         self.food.set_position(*self.get_random_coordinate())
 
     def get_visual_help(self):
-        self.draw_grid(self.screen, self.boundaries, self.gap_size)
-        self.draw_grid_edges(self.screen, self.boundaries)
+        self.draw_grid()
+        self.draw_grid_edges()
         self.fill_lowest_gaps()
 
-    @staticmethod
-    def draw_grid_edges(bounded_screen, boundaries):
-        color = bounded_screen.utility_turtle.pencolor()
-        speed = bounded_screen.utility_turtle.speed()
-        bounded_screen.utility_turtle.speed(0)
-        bounded_screen.utility_turtle.pencolor(GRID_EDGE_COLOR)
-        turtle = bounded_screen.utility_turtle
-        turtle.goto(boundaries[LEFT], boundaries[UP])
+    def draw_grid_edges(self, color=None):
+        color = GRID_EDGE_COLOR if color is None else color
+        backup_color = ScreenBox().utility_turtle.pencolor()
+        speed = ScreenBox().utility_turtle.speed()
+        ScreenBox().utility_turtle.speed(0)
+        ScreenBox().utility_turtle.pencolor(color)
+        turtle = ScreenBox().utility_turtle
+        turtle.goto(self.boundaries[LEFT], self.boundaries[UP])
         turtle.pendown()
-        turtle.goto(boundaries[RIGHT], boundaries[UP])
-        turtle.goto(boundaries[RIGHT], boundaries[DOWN])
-        turtle.goto(boundaries[LEFT], boundaries[DOWN])
-        turtle.goto(boundaries[LEFT], boundaries[UP])
+        turtle.goto(self.boundaries[RIGHT], self.boundaries[UP])
+        turtle.goto(self.boundaries[RIGHT], self.boundaries[DOWN])
+        turtle.goto(self.boundaries[LEFT], self.boundaries[DOWN])
+        turtle.goto(self.boundaries[LEFT], self.boundaries[UP])
         turtle.penup()
-        bounded_screen.utility_turtle.pencolor(color)
-        bounded_screen.utility_turtle.speed(speed)
+        ScreenBox().utility_turtle.pencolor(backup_color)
+        ScreenBox().utility_turtle.speed(speed)
 
-    @staticmethod
-    def draw_grid(bounded_screen, boundaries, gap_size):
-        color = bounded_screen.utility_turtle.pencolor()
-        speed = bounded_screen.utility_turtle.speed()
-        bounded_screen.utility_turtle.speed(0)
-        bounded_screen.utility_turtle.pencolor(GRID_COLOR)
-        turtle = bounded_screen.utility_turtle
-        for y in range(boundaries[DOWN], boundaries[UP] + 1, gap_size):
-            turtle.goto(boundaries[LEFT], y)
+    def draw_grid(self):
+        color = ScreenBox().utility_turtle.pencolor()
+        speed = ScreenBox().utility_turtle.speed()
+        ScreenBox().utility_turtle.speed(0)
+        ScreenBox().utility_turtle.pencolor(GRID_COLOR)
+        turtle = ScreenBox().utility_turtle
+        for y in range(self.boundaries[DOWN], self.boundaries[UP] + 1, self.gap_size):
+            turtle.goto(self.boundaries[LEFT], y)
             turtle.pendown()
-            turtle.goto(boundaries[RIGHT], y)
+            turtle.goto(self.boundaries[RIGHT], y)
             turtle.penup()
-        for x in range(boundaries[LEFT], boundaries[RIGHT] + 1, gap_size):
-            turtle.goto(x, boundaries[UP])
+        for x in range(self.boundaries[LEFT], self.boundaries[RIGHT] + 1, self.gap_size):
+            turtle.goto(x, self.boundaries[UP])
             turtle.pendown()
-            turtle.goto(x, boundaries[DOWN])
+            turtle.goto(x, self.boundaries[DOWN])
             turtle.penup()
-        bounded_screen.utility_turtle.pencolor(color)
-        bounded_screen.utility_turtle.speed(speed)
+        ScreenBox().utility_turtle.pencolor(color)
+        ScreenBox().utility_turtle.speed(speed)
 
     def fill_lowest_gaps(self):
         for x in range(self.horizontal_gap_count):
@@ -128,10 +127,10 @@ class FoodGrid:
         return adjusted_boundary
 
     def get_grid_bounds(self):
-        left_bound = self.screen.left_bound
-        right_bound = self.screen.right_bound
-        up_bound = self.screen.up_bound - self.scoreboard.scoreboard_height
-        down_bound = self.screen.down_bound
+        left_bound = ScreenBox().left_bound
+        right_bound = ScreenBox().right_bound
+        up_bound = ScreenBox().up_bound - self.scoreboard.scoreboard_height
+        down_bound = ScreenBox().down_bound
 
         # calculate amount of gaps that can fit horizontally
         raw_width = abs(left_bound) + abs(right_bound)

@@ -4,17 +4,21 @@ from tkinter.font import Font
 SCORE_FONT = ("Terminal", 16, "bold")
 GAME_OVER_FONT = ("Terminal", 50, "bold")
 X, Y = 0, 1
+SCORE_COLOR = "magenta"
+GAME_OVER_SHADOW_COLOR = "yellow"
+GAME_OVER_COLOR = "red"
 
 
 class Scoreboard(Turtle):
 
-    def __init__(self, up_bound):
+    def __init__(self, up_bound, color=None):
         super().__init__(visible=False)
+        color = SCORE_COLOR if color is None else color
         self.score = 0
         self.scoreboard_width = 0
         self.scoreboard_height = self.get_font_height(SCORE_FONT)
         self.starting_position = 0, up_bound - self.scoreboard_height
-        self.pencolor("white")
+        self.pencolor(color)
         self.speed(0)
         self.penup()
         self.print_score()
@@ -39,7 +43,7 @@ class Scoreboard(Turtle):
     def print_game_over(self):
         x = 0
         y = - int(self.get_font_height(GAME_OVER_FONT) / 2)
-        self.color("yellow")
+        self.color(GAME_OVER_SHADOW_COLOR)
         rotation_degrees = 45
         for _ in range(int(360 / rotation_degrees)):
             self.setposition(x, y)
@@ -48,7 +52,7 @@ class Scoreboard(Turtle):
             self.write("GAME OVER", move=False, align="center", font=GAME_OVER_FONT)
 
         self.setposition(x, y)
-        self.color("red")
+        self.color(GAME_OVER_COLOR)
         self.write("GAME OVER", move=False, align="center", font=GAME_OVER_FONT)
 
     def increase_score(self):

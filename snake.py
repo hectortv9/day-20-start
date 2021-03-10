@@ -1,5 +1,5 @@
-from turtle import Turtle, Screen
-import utils
+from turtle import Turtle
+from screen_box import ScreenBox
 
 RIGHT = 0
 UP = 90
@@ -7,38 +7,35 @@ LEFT = 180
 DOWN = 270
 
 X, Y = 0, 1
-SNAKE_COLOR = "white"
+SNAKE_COLOR = "magenta"
 
 
 class SnakePart(Turtle):
 
-    def __init__(self, x, y, color=SNAKE_COLOR):
+    def __init__(self, x, y, color=None):
         super().__init__(shape="square", visible=False)
+        color = SNAKE_COLOR if color is None else color
         self.penup()
         self.speed(0)
-        self.color(SNAKE_COLOR)
+        self.color(color)
         self.setposition(x, y)
         self.showturtle()
 
 
 class Snake:
 
-    def __init__(self, size, color, transform_to_complementary):
-        self.set_snake_default_color(color, transform_to_complementary, Screen().colormode())
+    def __init__(self, size, color=SNAKE_COLOR):
+        self.set_snake_default_color(color)
         self.SNAKE_PART_SIZE = 20
         self.turning = False
         self.body = [SnakePart(0, 0)]
         self.head = self.body[0]
-        self.screen = self.head.getscreen()
         self.grow_snake(size - 1)  # head counts as part of Snake's size
 
     @staticmethod
-    def set_snake_default_color(color, transform_to_complementary, colormode):
+    def set_snake_default_color(color):
         global SNAKE_COLOR
-        if transform_to_complementary:
-            SNAKE_COLOR = utils.get_complementary_color(color, colormode)
-        else:
-            SNAKE_COLOR = color
+        SNAKE_COLOR = color
 
     @staticmethod
     def get_xy_increment(x, y, heading, distance):
@@ -61,18 +58,18 @@ class Snake:
         }[heading]
 
     def grow_snake(self, number_of_parts):
-        self.screen.tracer(0)
+        ScreenBox().screen.tracer(0)
         for _ in range(number_of_parts):
             tail = self.body[-1]
             new_position = Snake.get_xy_decrement(tail.xcor(), tail.ycor(), tail.heading(), self.SNAKE_PART_SIZE)
             self.add_part(*new_position)
-        self.screen.tracer(1)
+        ScreenBox().screen.tracer(1)
 
     def add_part(self, x, y):
         self.body.append(SnakePart(x, y))
 
     def move(self, grid):
-        self.screen.tracer(0)
+        ScreenBox().screen.tracer(0)
         original_heading = self.head.heading()
         original_position = self.head.position()
         self.head.forward(self.SNAKE_PART_SIZE)
@@ -106,7 +103,7 @@ class Snake:
                 original_position = position
             if did_eat:
                 self.add_part(*original_position)
-        self.screen.tracer(1)
+        ScreenBox().screen.tracer(1)
         return {"did_collide": did_collide, "did_eat": did_eat}
 
     def left(self):
@@ -140,4 +137,3 @@ class Snake:
         if self.head.heading() in (LEFT, RIGHT):
             self.head.setheading(DOWN)
         self.turning = False
-

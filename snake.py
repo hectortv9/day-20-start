@@ -7,14 +7,14 @@ LEFT = 180
 DOWN = 270
 
 X, Y = 0, 1
-SNAKE_COLOR = "magenta"
+snake_color = "magenta"
 
 
 class SnakePart(Turtle):
 
     def __init__(self, x, y, color=None):
         super().__init__(shape="square", visible=False)
-        color = SNAKE_COLOR if color is None else color
+        color = snake_color if color is None else color
         self.penup()
         self.speed(0)
         self.color(color)
@@ -24,7 +24,7 @@ class SnakePart(Turtle):
 
 class Snake:
 
-    def __init__(self, size, color=SNAKE_COLOR):
+    def __init__(self, size, color=snake_color):
         self.set_snake_default_color(color)
         self.SNAKE_PART_SIZE = 20
         self.turning = False
@@ -34,8 +34,8 @@ class Snake:
 
     @staticmethod
     def set_snake_default_color(color):
-        global SNAKE_COLOR
-        SNAKE_COLOR = color
+        global snake_color
+        snake_color = color
 
     @staticmethod
     def get_xy_increment(x, y, heading, distance):

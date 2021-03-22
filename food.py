@@ -39,9 +39,12 @@ class FoodGrid:
         self.right_bound = self.boundaries[RIGHT]
         self.down_bound = self.boundaries[DOWN]
 
+        self.horizontal_gap_count = int(abs(self.right_bound - self.left_bound) / gap_size)
+        self.vertical_gap_count = int(abs(self.up_bound - self.down_bound) / gap_size)
         self.lowest_gap = (int(self.left_bound + gap_size / 2), int(self.down_bound + gap_size / 2))
-        self.horizontal_gap_count = int((abs(self.left_bound) + abs(self.right_bound)) / gap_size)
-        self.vertical_gap_count = int((abs(self.up_bound) + abs(self.down_bound)) / gap_size)
+        self.center_gap = (int(self.horizontal_gap_count / 2) * gap_size + self.lowest_gap[X],
+                           int(self.vertical_gap_count / 2) * gap_size + self.lowest_gap[Y])
+        # center_gap will lean towards +x, +y when gaps are even, it will get perfectly centered when they are odd
 
         self.food = Food(*self.get_random_coordinate())
         self.eaten_distance = gap_size * 0.7  # distance at which food can be considered eaten by snake

@@ -7,6 +7,8 @@ X, Y = 0, 1
 SCORE_COLOR = "magenta"
 GAME_OVER_SHADOW_COLOR = "yellow"
 GAME_OVER_COLOR = "red"
+TOP_MARGIN = 20
+BOTTOM_MARGIN = 10
 
 
 class Scoreboard(Turtle):
@@ -16,8 +18,8 @@ class Scoreboard(Turtle):
         color = SCORE_COLOR if color is None else color
         self.score = 0
         self.scoreboard_width = 0
-        self.scoreboard_height = self.get_font_height(SCORE_FONT)
-        self.starting_position = 0, up_bound - self.scoreboard_height
+        self.scoreboard_height = self.get_font_height(SCORE_FONT) + TOP_MARGIN + BOTTOM_MARGIN
+        self.starting_position = 0, up_bound - (self.scoreboard_height - BOTTOM_MARGIN)
         self.pencolor(color)
         self.speed(0)
         self.penup()
